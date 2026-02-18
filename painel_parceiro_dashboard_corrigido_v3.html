@@ -282,7 +282,7 @@
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
         <div class="txt">
-          <h1>Painel do Parceiro</h1>
+          <h1></h1>
         </div>
       </div>
 
@@ -431,11 +431,11 @@
           </div>
 
           <div class="spreadCard">
-            <div class="label">Receita total gerada pelo Spread (período)</div>
+            <div class="label">Receita total gerada pelo seu Spread (período)</div>
             <div class="value mono" id="spreadTotal">—</div>
             <div class="hint">
-              Este valor está como <b>mock</b> apenas para teste local. Quando você plugar sua API,
-              basta preencher o campo <span class="mono">spread</span> por transação/linha e o painel soma automaticamente.
+              <b>mock</b> 
+           <span class="mono">spread</span> 
             </div>
           </div>
         </div>
@@ -444,7 +444,7 @@
           <div class="panel-head">
             <div>
               <h3>Distribuição por bandeira</h3>
-              <div class="meta">Participação aproximada sobre o volume do período selecionado (mock).</div>
+              <div class="meta">Participação aproximada sobre o volume do período selecionado .</div>
             </div>
             <div class="panel-actions">
               <button class="btn ghost" id="btnToggleBars">⇄ Alternar</button>
@@ -462,7 +462,7 @@
           <div class="panel-head">
             <div>
               <h3>Liquidações por estabelecimento</h3>
-              <div class="meta">Filtre por bandeira e tipo (Crédito, Débito, Parcelado e Pix). Clique no cabeçalho para ordenar.</div>
+              <div class="meta">Filtre por bandeira e tipo (Crédito, Débito, Parcelado e Pix). </div>
             </div>
             <div class="panel-actions">
               <div class="control" style="padding:8px 10px;border-radius:12px">
@@ -495,22 +495,6 @@
         </div>
       </section>
 
-      <!-- PAGE: RELATORIOS -->
-      <section class="page" id="page-relatorios">
-        <div class="card section">
-          <h3>Relatórios</h3>
-          <p class="meta" style="max-width:90ch">
-            Exportação rápida do que estiver filtrado (CSV/JSON). Em produção, dá para colocar PDF consolidado mensal,
-            CNAB e resumo por bandeira/loja.
-          </p>
-
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
-            <button class="btn" id="exportCsv2">⬇️ Exportar CSV (tabela)</button>
-            <button class="btn ghost" id="downloadJson">⬇️ Baixar JSON</button>
-            <button class="btn ghost" id="print">🖨️ Imprimir</button>
-          </div>
-        </div>
-      </section>
 
       <div class="tooltip" id="tooltip"></div>
     </main>
@@ -518,7 +502,7 @@
 
   <script>
     // ============================
-    // Mock data (substitua pela sua API)
+    // 
     // ============================
     const fmtUSD = new Intl.NumberFormat("en-US", { style:"currency", currency:"USD" });
     const fmtNum = new Intl.NumberFormat("pt-BR");
@@ -542,10 +526,10 @@
     };
 
     const estabs = [
-      { id:"E001", nome:"Mercado Bom Preço", cidade:"Orlando", ativo:true },
-      { id:"E002", nome:"Farmácia Central", cidade:"Kissimmee", ativo:true },
-      { id:"E003", nome:"Restaurante Sabor BR", cidade:"Orlando", ativo:true },
-      { id:"E004", nome:"Auto Center Prime", cidade:"Winter Park", ativo:true },
+      { id:"E001", nome:"Mercado Bom Preço", cidade:"Recife", ativo:true },
+      { id:"E002", nome:"Farmácia Central", cidade:"Sorocaba", ativo:true },
+      { id:"E003", nome:"Bar do Julio (Bar Gay)", cidade:"Baixada Fluminense", ativo:true },
+      { id:"E004", nome:"Auto Center Prime", cidade:"Fortaleza", ativo:true },
       { id:"E005", nome:"Loja Tech Express", cidade:"Orlando", ativo:true },
       { id:"E006", nome:"Padaria da Esquina", cidade:"Clermont", ativo:true },
       { id:"E007", nome:"Boutique Aurora", cidade:"Lake Buena Vista", ativo:true },
