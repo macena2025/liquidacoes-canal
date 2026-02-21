@@ -3,40 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Painel do Parceiro • Liquidações</title>
+  <title>Painel do Parceiro • Premium</title>
+
+  <!-- Charts (CDN). If offline, the UI still works; charts show a fallback notice. -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root{
-      --bg:#0b1220;
-      --panel:#0f172a;
-      --card:#0f1a31;
+      --bg:#0a0f1c;
+      --panel:#0d1323;
+      --card:#111827;
       --border:rgba(255,255,255,.08);
-      --muted:rgba(255,255,255,.65);
+      --muted:rgba(255,255,255,.68);
       --text:rgba(255,255,255,.92);
       --good:#22c55e;
       --warn:#f59e0b;
       --bad:#ef4444;
-      --accent:#16a34a;
-      --accent2:#34d399;
-      --shadow: 0 14px 40px rgba(0,0,0,.35);
-      --radius:16px;
+      --accent:#22c55e;
+      --shadow: 0 18px 55px rgba(0,0,0,.42);
+      --radius:18px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
     *{ box-sizing:border-box }
     body{
       margin:0;
-      background: radial-gradient(1200px 700px at 20% 0%, rgba(22,163,74,.22), transparent 55%),
-                  radial-gradient(900px 500px at 100% 0%, rgba(52,211,153,.10), transparent 50%),
-                  var(--bg);
+      background:
+        radial-gradient(1000px 600px at 18% 0%, rgba(34,197,94,.18), transparent 55%),
+        radial-gradient(800px 520px at 100% 0%, rgba(59,130,246,.10), transparent 55%),
+        var(--bg);
       color:var(--text);
       font-family:var(--sans);
       line-height:1.35;
     }
+
+    /* App layout */
     .app{
       display:grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 270px 1fr;
       min-height:100vh;
     }
+
     /* Sidebar */
     .sidebar{
       position:sticky;
@@ -60,9 +67,9 @@
       border-radius:12px;
       background:
         radial-gradient(12px 12px at 35% 35%, rgba(255,255,255,.9), rgba(255,255,255,.0) 65%),
-        radial-gradient(24px 24px at 70% 70%, rgba(52,211,153,.55), rgba(22,163,74,.0) 60%),
-        linear-gradient(135deg, rgba(22,163,74,1), rgba(16,185,129,1));
-      box-shadow: 0 10px 30px rgba(22,163,74,.25);
+        radial-gradient(24px 24px at 70% 70%, rgba(34,197,94,.55), rgba(34,197,94,.0) 60%),
+        linear-gradient(135deg, rgba(34,197,94,1), rgba(16,185,129,1));
+      box-shadow: 0 10px 30px rgba(34,197,94,.22);
     }
     .brand h1{ font-size:14px; margin:0; letter-spacing:.2px; }
     .nav{ display:flex; flex-direction:column; gap:6px; padding:10px 6px; }
@@ -72,7 +79,7 @@
       background: transparent;
       color:var(--text);
       padding:10px 10px;
-      border-radius:12px;
+      border-radius:14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -82,18 +89,20 @@
     }
     .nav button:hover{ background: rgba(255,255,255,.04); border-color: rgba(255,255,255,.06); }
     .nav button.active{
-      background: linear-gradient(180deg, rgba(22,163,74,.22), rgba(22,163,74,.08));
+      background: linear-gradient(180deg, rgba(34,197,94,.18), rgba(34,197,94,.06));
       border-color: rgba(34,197,94,.35);
       box-shadow: 0 10px 28px rgba(0,0,0,.18);
     }
     .nav .left{ display:flex; align-items:center; gap:10px; }
     .ico{
       width:32px; height:32px;
-      border-radius:11px;
+      border-radius:12px;
       display:grid; place-items:center;
       background: rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.06);
+      font-size:16px;
     }
+
     /* Main */
     .main{ padding:22px 22px 28px; }
     .topbar{
@@ -105,8 +114,11 @@
       flex-wrap:wrap;
     }
     .title h2{ margin:0; font-size:20px; letter-spacing:.2px; }
-    .title p{ margin:6px 0 0; color:var(--muted); font-size:13px; max-width:70ch; }
-    .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
+    .title p{ margin:6px 0 0; color:var(--muted); font-size:13px; max-width:80ch; }
+
+    .toolbar{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-end;
+    }
     .control{
       display:flex; align-items:center; gap:8px;
       padding:10px 12px;
@@ -123,9 +135,10 @@
       font-size:12px;
       min-width: 135px;
     }
+
     .btn{
-      border:1px solid rgba(34,197,94,.35);
-      background: linear-gradient(180deg, rgba(22,163,74,.35), rgba(22,163,74,.12));
+      border:1px solid rgba(34,197,94,.30);
+      background: linear-gradient(180deg, rgba(34,197,94,.34), rgba(34,197,94,.12));
       color:rgba(255,255,255,.95);
       padding:10px 12px;
       border-radius:14px;
@@ -136,72 +149,95 @@
       display:flex;
       align-items:center;
       gap:8px;
+      white-space:nowrap;
     }
     .btn:hover{ transform: translateY(-1px); }
-    .btn.ghost{ background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.08); }
-    .kpis{
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap:12px;
-      margin-top:14px;
-    }
+    .btn.ghost{ background: rgba(255,255,255,.03); border-color: rgba(255,255,255,.10); }
+
+    /* Cards */
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
       border:1px solid rgba(255,255,255,.07);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
     }
+
+    /* KPI grids */
+    .kpis-4{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:12px;
+      margin-top:14px;
+    }
+    .kpis-3{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:12px;
+      margin-top:12px;
+    }
     .kpi{ padding:14px 14px 12px; position:relative; overflow:hidden; }
     .kpi .row{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
-    .kpi h3{ margin:0; font-size:12px; color:var(--muted); font-weight:600; }
-    .kpi .val{ margin:6px 0 0; font-size:22px; letter-spacing:.2px; font-weight:750; }
+    .kpi h3{ margin:0; font-size:12px; color:var(--muted); font-weight:650; }
+    .kpi .val{ margin:6px 0 0; font-size:22px; letter-spacing:.2px; font-weight:780; }
     .kpi .sub{ margin:6px 0 0; display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px; }
     .badge{ font-size:11px; padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.05); }
     .badge.good{ border-color: rgba(34,197,94,.35); color: rgba(167,243,208,.95); background: rgba(34,197,94,.12); }
-    .badge.bad{ border-color: rgba(239,68,68,.35); color: rgba(254,202,202,.95); background: rgba(239,68,68,.10); }
     .badge.warn{ border-color: rgba(245,158,11,.35); color: rgba(253,230,138,.95); background: rgba(245,158,11,.10); }
+    .badge.bad{ border-color: rgba(239,68,68,.35); color: rgba(254,202,202,.95); background: rgba(239,68,68,.10); }
+    .inativosRed{ color: rgba(254,202,202,.98); font-weight:800; }
+
     .section{ padding:14px; }
     .section h3{ margin:0; font-size:13px; color:rgba(255,255,255,.88); letter-spacing:.2px; }
     .section .meta{ margin:6px 0 0; color:var(--muted); font-size:12px; }
     .panel-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; flex-wrap:wrap; }
-    .panel-actions{ display:flex; gap:8px; flex-wrap:wrap; }
-    .chip{
-      border:1px solid rgba(255,255,255,.09);
-      background: rgba(255,255,255,.04);
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:12px;
-      color: rgba(255,255,255,.85);
-      cursor:pointer;
-      user-select:none;
+    .panel-actions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+    /* Dashboard layout blocks */
+    .dash-grid{
+      display:grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap:14px;
+      align-items:stretch;
+      margin-top:14px;
     }
-    .chip.active{
-      border-color: rgba(34,197,94,.35);
-      background: rgba(34,197,94,.12);
-      color: rgba(167,243,208,.95);
-    }
-    .grid{ display:grid; grid-template-columns: 1fr 360px; gap:14px; align-items:start; margin-top:14px; }
-    .chartWrap{ padding:10px 10px 6px; }
-    svg.chart{
-      width:100%;
-      height:280px;
-      display:block;
-      border-radius: 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-      border:1px solid rgba(255,255,255,.06);
-    }
-    .spreadCard{
+
+    .highlightCard{
       padding:16px;
       background:
-        radial-gradient(600px 260px at 30% 0%, rgba(34,197,94,.30), transparent 55%),
-        linear-gradient(180deg, rgba(22,163,74,.25), rgba(22,163,74,.08));
+        radial-gradient(600px 260px at 30% 0%, rgba(34,197,94,.26), transparent 55%),
+        linear-gradient(180deg, rgba(34,197,94,.18), rgba(34,197,94,.05));
       border:1px solid rgba(34,197,94,.35);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
     }
-    .spreadCard .label{ color: rgba(255,255,255,.80); font-size:12px; }
-    .spreadCard .value{ margin-top:10px; font-size:34px; font-weight:800; letter-spacing:.2px; }
-    .spreadCard .hint{ margin-top:10px; color: rgba(255,255,255,.72); font-size:12px; line-height:1.45; }
+    .highlightCard .label{ color: rgba(255,255,255,.80); font-size:12px; }
+    .highlightCard .value{ font-size:34px; font-weight:860; letter-spacing:.2px; }
+    .highlightCard .hint{ color: rgba(255,255,255,.72); font-size:12px; line-height:1.45; }
+
+    .spreadMini{
+      height:110px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      padding: 8px 10px;
+    }
+
+    .charts-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      margin-top:14px;
+      align-items:stretch;
+    }
+    .chartTitle{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+    .chartTitle span{ color: rgba(255,255,255,.88); font-size:13px; font-weight:700; }
+    .chartWrap{ height: 290px; }
+    .chartWrap.small{ height: 260px; }
+    canvas{ width:100% !important; height:100% !important; }
+
     /* Table */
     .tableWrap{
       overflow:auto;
@@ -209,7 +245,7 @@
       border:1px solid rgba(255,255,255,.07);
       background: rgba(255,255,255,.02);
     }
-    table{ width:100%; border-collapse:separate; border-spacing:0; min-width: 980px; }
+    table{ width:100%; border-collapse:separate; border-spacing:0; min-width: 1100px; }
     thead th{
       text-align:left;
       font-size:12px;
@@ -217,13 +253,14 @@
       padding:12px 12px;
       border-bottom:1px solid rgba(255,255,255,.08);
       position:sticky; top:0;
-      background: rgba(15,23,42,.85);
+      background: rgba(17,24,39,.80);
       backdrop-filter: blur(8px);
       cursor:pointer; user-select:none; white-space:nowrap;
     }
     tbody td{ padding:12px 12px; font-size:12px; border-bottom:1px solid rgba(255,255,255,.06); color: rgba(255,255,255,.88); white-space:nowrap; }
     tbody tr:hover td{ background: rgba(255,255,255,.03); }
-    .status{
+
+    .statusPill{
       padding:4px 10px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,.10);
@@ -231,83 +268,227 @@
       font-size:11px;
       display:inline-flex; align-items:center; gap:6px;
     }
-    .status .sDot{ width:8px;height:8px;border-radius:999px; background: rgba(255,255,255,.45); }
-    .status.liquidado{ border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); }
-    .status.liquidado .sDot{ background: var(--good); box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
-    .status.processando{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.10); }
-    .status.processando .sDot{ background: var(--warn); box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
-    .status.divergencia{ border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.09); }
-    .status.divergencia .sDot{ background: var(--bad); box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
+    .statusPill .dot{ width:8px;height:8px;border-radius:999px; background: rgba(255,255,255,.45); }
+    .statusPill.liquidado{ border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); }
+    .statusPill.liquidado .dot{ background: var(--good); box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
+    .statusPill.agendado{ border-color: rgba(245,158,11,.35); background: rgba(245,158,11,.10); }
+    .statusPill.agendado .dot{ background: var(--warn); box-shadow: 0 0 0 3px rgba(245,158,11,.14); }
+
+    .bankPill{
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      font-size:11px;
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .bankPill .dot{ width:8px;height:8px;border-radius:999px; background: rgba(255,255,255,.45); }
+    .bankPill.xpay{ border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); color: rgba(167,243,208,.95); }
+    .bankPill.xpay .dot{ background: var(--good); box-shadow: 0 0 0 3px rgba(34,197,94,.15); }
+    .bankPill.other{ border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.09); color: rgba(254,202,202,.95); }
+    .bankPill.other .dot{ background: var(--bad); box-shadow: 0 0 0 3px rgba(239,68,68,.12); }
+
+    .link{
+      color: rgba(147,197,253,.95);
+      cursor:pointer;
+      text-decoration: none;
+      font-weight:700;
+    }
+    .link:hover{ text-decoration: underline; }
+
     .muted{ color: var(--muted) }
     .mono{ font-family: var(--mono) }
+
+    /* Pages */
     .page{ display:none; }
     .page.active{ display:block; }
-    .tooltip{
-      position:fixed;
-      pointer-events:none;
-      transform: translate(10px, 10px);
-      padding:10px 10px;
-      border-radius:14px;
+
+    /* Mobile nav */
+    .mobileTop{
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:14px 14px;
+      border-bottom:1px solid var(--border);
+      background: rgba(13,19,35,.7);
+      backdrop-filter: blur(10px);
+      position:sticky;
+      top:0;
+      z-index:5;
+    }
+    .hamb{
+      width:42px;height:42px;border-radius:14px;
       border:1px solid rgba(255,255,255,.10);
-      background: rgba(15,23,42,.92);
-      box-shadow: 0 18px 50px rgba(0,0,0,.35);
-      font-size:12px;
-      color: rgba(255,255,255,.92);
-      opacity:0;
-      transition:.08s ease;
-      min-width: 220px;
-      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      cursor:pointer;
+      font-size:18px;
     }
-    .tooltip b{ display:block; font-size:12px; margin-bottom:4px; }
-    .tooltip .row{ display:flex; justify-content:space-between; gap:10px; color: var(--muted); }
-    .tooltip .row span:last-child{ color: rgba(255,255,255,.9); }
+    .drawer{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      z-index:10;
+    }
+    .drawer.open{ display:block; }
+    .drawerPanel{
+      width: 86%;
+      max-width: 320px;
+      height: 100%;
+      background: rgba(13,19,35,.96);
+      border-right:1px solid rgba(255,255,255,.10);
+      padding: 16px 12px;
+      box-shadow: 0 40px 90px rgba(0,0,0,.55);
+    }
+
+    /* Drill-down modal */
+    .modalBack{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.58);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:20;
+      padding: 18px;
+    }
+    .modalBack.open{ display:flex; }
+    .modal{
+      width: min(980px, 96vw);
+      max-height: 88vh;
+      overflow:auto;
+      background: rgba(17,24,39,.96);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      box-shadow: 0 55px 130px rgba(0,0,0,.65);
+      padding: 16px;
+    }
+    .modalHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      margin-bottom: 12px;
+    }
+    .modalHead h3{ margin:0; font-size:16px; }
+    .modalGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top: 12px;
+    }
+    .miniKpis{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+      margin-top: 12px;
+    }
+    .miniKpis .card{ box-shadow:none; }
+    .mini{ padding:12px; border-radius: 16px; border:1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); }
+    .mini .t{ color: var(--muted); font-size:12px; }
+    .mini .v{ margin-top:6px; font-size:18px; font-weight:850; }
+    .modalChart{ height: 260px; }
+    .modalChart.small{ height: 220px; }
+    .modalFooter{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top: 12px;
+    }
+
     @media (max-width: 1100px){
-      .app{ grid-template-columns: 88px 1fr; }
-      .brand .txt{ display:none; }
-      .nav button{ justify-content:center; }
-      .nav .left span{ display:none; }
-      .kpis{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .grid{ grid-template-columns: 1fr; }
+      .kpis-4{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .kpis-3{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .dash-grid{ grid-template-columns: 1fr; }
+      .charts-row{ grid-template-columns: 1fr; }
+      .modalGrid{ grid-template-columns: 1fr; }
+      .miniKpis{ grid-template-columns: 1fr; }
     }
-    @media (max-width: 560px){
+    @media (max-width: 860px){
+      .app{ grid-template-columns: 1fr; }
+      .sidebar{ display:none; }
+      .mobileTop{ display:flex; }
       .main{ padding:16px; }
-      .kpis{ grid-template-columns: 1fr; }
+      .kpis-3{ grid-template-columns: 1fr; }
+      .toolbar{ justify-content:flex-start; }
       .control input, .control select{ min-width: 120px; }
     }
   </style>
 </head>
 <body>
+  <div class="mobileTop">
+    <button class="hamb" id="btnMenu" aria-label="Menu">☰</button>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="logo" aria-hidden="true" style="width:28px;height:28px;border-radius:10px"></div>
+      <div style="font-weight:850">Painel do Parceiro</div>
+    </div>
+    <div style="width:42px"></div>
+  </div>
+
+  <div class="drawer" id="drawer">
+    <div class="drawerPanel">
+      <div class="brand" style="border-bottom:1px solid rgba(255,255,255,.10)">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="txt"><h1>Painel do Parceiro</h1></div>
+      </div>
+      <nav class="nav" aria-label="Navegação móvel" id="navMobile"></nav>
+    </div>
+  </div>
+
+  <!-- Drill-down modal -->
+  <div class="modalBack" id="modalBack" role="dialog" aria-modal="true" aria-label="Detalhes do estabelecimento">
+    <div class="modal">
+      <div class="modalHead">
+        <div>
+          <h3 id="modalTitle">Estabelecimento</h3>
+          <div class="muted" id="modalSub" style="margin-top:4px;font-size:12px">—</div>
+        </div>
+        <button class="btn ghost" id="btnCloseModal">✕ Fechar</button>
+      </div>
+
+      <div class="miniKpis">
+        <div class="mini">
+          <div class="t">Status</div>
+          <div class="v" id="mStatus">—</div>
+        </div>
+        <div class="mini">
+          <div class="t">Banco</div>
+          <div class="v" id="mBanco">—</div>
+        </div>
+        <div class="mini">
+          <div class="t">Liquidado (período)</div>
+          <div class="v" id="mLiquidado">—</div>
+        </div>
+      </div>
+
+      <div class="modalGrid">
+        <div class="card section">
+          <div class="chartTitle"><span>Histórico (14 dias)</span><span class="muted" style="font-size:12px">liquidação</span></div>
+          <div class="modalChart"><canvas id="mLine"></canvas></div>
+        </div>
+        <div class="card section">
+          <div class="chartTitle"><span>Split por tipo (mock)</span><span class="muted" style="font-size:12px">quantidade</span></div>
+          <div class="modalChart small"><canvas id="mBars"></canvas></div>
+        </div>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn" id="btnGoLiquidacoes">Ir para Liquidações</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
         <div class="logo" aria-hidden="true"></div>
-        <div class="txt">
-          <h1></h1>
-        </div>
+        <div class="txt"><h1>Painel do Parceiro</h1></div>
       </div>
-
-      <nav class="nav" aria-label="Navegação">
-        <button class="active" data-page="dashboard">
-          <div class="left">
-            <div class="ico">📊</div>
-            <span>Dashboard</span>
-          </div>
-        </button>
-
-        <button data-page="liquidacoes">
-          <div class="left">
-            <div class="ico">💸</div>
-            <span>Liquidações</span>
-          </div>
-        </button>
-
-        <button data-page="relatorios">
-          <div class="left">
-            <div class="ico">📄</div>
-            <span>Relatórios</span>
-          </div>
-        </button>
-      </nav>
+      <nav class="nav" aria-label="Navegação" id="navDesktop"></nav>
     </aside>
 
     <main class="main">
@@ -317,7 +498,7 @@
           <p id="pageDesc">Visão geral das liquidações dos estabelecimentos cadastrados abaixo do seu canal.</p>
         </div>
 
-        <div class="toolbar">
+        <div class="toolbar" aria-label="Filtros">
           <div class="control">
             <label for="from">De</label>
             <input id="from" type="date" />
@@ -341,27 +522,57 @@
             <label for="tipo">Tipo</label>
             <select id="tipo">
               <option value="ALL">Todos</option>
-              <option value="CREDITO">Crédito</option>
-              <option value="DEBITO">Débito</option>
-              <option value="PARCELADO">Crédito Parcelado</option>
+              <option value="CREDITO">Crédito à vista</option>
+              <option value="DEBITO">Débito à vista</option>
+              <option value="PARCELADO">Crédito parcelado</option>
               <option value="PIX">Pix</option>
             </select>
           </div>
-          <button class="btn" id="apply">🔎 Aplicar</button>
-          <button class="btn ghost" id="reset">↩︎ Reset</button>
+
+          <button class="btn" id="apply">🔎 Ativar filtros</button>
+          <button class="btn ghost" id="quickSearch">⚡ Busca rápida</button>
         </div>
       </div>
 
       <!-- PAGE: DASHBOARD -->
       <section class="page active" id="page-dashboard">
-        <div class="kpis">
+        <!-- KPI row 1 (inclui Liquidado Hoje vs A Liquidar) -->
+        <div class="kpis-4">
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>Liquidado hoje</h3>
+                <div class="val" id="kpiLiqHoje">—</div>
+                <div class="sub">
+                  <span class="badge good">D+0</span>
+                  <span class="muted">liquidações do dia</span>
+                </div>
+              </div>
+              <div class="ico" title="Hoje">🗓️</div>
+            </div>
+          </div>
+
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>A liquidar</h3>
+                <div class="val" id="kpiALiquidar">—</div>
+                <div class="sub">
+                  <span class="badge warn">Agendado</span>
+                  <span class="muted">próximos repasses</span>
+                </div>
+              </div>
+              <div class="ico" title="A liquidar">⏳</div>
+            </div>
+          </div>
+
           <div class="card kpi">
             <div class="row">
               <div>
                 <h3>Total liquidado no período</h3>
                 <div class="val" id="kpiLiquidado">—</div>
                 <div class="sub">
-                  <span class="badge good" id="kpiLiquidadoDelta">—</span>
+                  <span class="badge" id="kpiLiquidadoDelta">—</span>
                   <span class="muted">vs período anterior</span>
                 </div>
               </div>
@@ -372,21 +583,7 @@
           <div class="card kpi">
             <div class="row">
               <div>
-                <h3>Estabelecimentos ativos</h3>
-                <div class="val" id="kpiEstabs">—</div>
-                <div class="sub">
-                  <span class="badge" id="kpiInativos">—</span>
-                  <span class="muted">inativos</span>
-                </div>
-              </div>
-              <div class="ico" title="Lojas">🏪</div>
-            </div>
-          </div>
-
-          <div class="card kpi">
-            <div class="row">
-              <div>
-                <h3>Total transacionado </h3>
+                <h3>Volume transacionado</h3>
                 <div class="val" id="kpiVolume">—</div>
                 <div class="sub">
                   <span class="badge warn" id="kpiTaxa">—</span>
@@ -396,72 +593,161 @@
               <div class="ico" title="Volume">💳</div>
             </div>
           </div>
+        </div>
+
+        <!-- KPI row 2 -->
+        <div class="kpis-3">
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>Estabelecimentos ativos</h3>
+                <div class="val" id="kpiEstabs">—</div>
+                <div class="sub">
+                  <span class="muted">inativos:</span>
+                  <span class="inativosRed" id="kpiInativos">—</span>
+                </div>
+              </div>
+              <div class="ico" title="Lojas">🏪</div>
+            </div>
+          </div>
 
           <div class="card kpi">
             <div class="row">
               <div>
-                <h3>Total Transacionado e-Commerce</h3>
-                <div class="val" id="kpiMedia">—</div>
+                <h3>Transações</h3>
+                <div class="val" id="kpiTransacoes">—</div>
                 <div class="sub">
-                  <span class="badge" id="kpiTicket">—</span>
-                  <span class="muted">ticket médio</span>
+                  <span class="badge">mock</span>
+                  <span class="muted">no período</span>
                 </div>
               </div>
-              <div class="ico" title="Média">📈</div>
+              <div class="ico" title="Transações">🧾</div>
+            </div>
+          </div>
+
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>Ticket médio</h3>
+                <div class="val" id="kpiTicketMedio">—</div>
+                <div class="sub">
+                  <span class="badge">mock</span>
+                  <span class="muted">por transação</span>
+                </div>
+              </div>
+              <div class="ico" title="Ticket">🎫</div>
             </div>
           </div>
         </div>
 
-        <div class="grid">
+        <div class="kpis-3">
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>Total transacionado (Admin)</h3>
+                <div class="val" id="kpiTotalTrans">—</div>
+                <div class="sub">
+                  <span class="badge">mock</span>
+                  <span class="muted">reconciliação</span>
+                </div>
+              </div>
+              <div class="ico" title="Total">📊</div>
+            </div>
+          </div>
+
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>Saldo BU</h3>
+                <div class="val" id="kpiSaldoBU">—</div>
+                <div class="sub">
+                  <span class="badge">mock</span>
+                  <span class="muted">saldo atual</span>
+                </div>
+              </div>
+              <div class="ico" title="Saldo">🏦</div>
+            </div>
+          </div>
+
+          <div class="card kpi">
+            <div class="row">
+              <div>
+                <h3>Receita Spread (período)</h3>
+                <div class="val mono" id="kpiSpread">—</div>
+                <div class="sub">
+                  <span class="badge good">mock</span>
+                  <span class="muted">estimativa</span>
+                </div>
+              </div>
+              <div class="ico" title="Spread">✨</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
           <div class="card section">
             <div class="panel-head">
               <div>
                 <h3>Liquidação diária</h3>
-                <div class="meta">Comparação: período atual vs período anterior (mesma duração).</div>
+                <div class="meta">Período atual vs anterior no tooltip. (mock)</div>
               </div>
               <div class="panel-actions">
-                <div class="chip active" data-series="liquidado">Liquidação</div>
-                <div class="chip" data-series="volume">Volume</div>
+                <button class="btn ghost" id="chipLiquidado">Liquidação</button>
+                <button class="btn ghost" id="chipVolume">Volume</button>
+                <button class="btn ghost" id="chipTaxa">Taxa média</button>
               </div>
             </div>
             <div class="chartWrap">
-              <svg class="chart" id="lineChart" viewBox="0 0 900 280" role="img" aria-label="Gráfico de linha"></svg>
+              <canvas id="lineChart"></canvas>
             </div>
           </div>
 
-          <div class="spreadCard">
-            <div class="label">Receita total gerada pelo seu Spread (período)</div>
-            <div class="value mono" id="spreadTotal">—</div>
-            <div class="hint">
-              <b></b> 
-           <span class="mono">spread</span> 
+          <!-- Spread card with mini 3-month horizontal bars -->
+          <div class="highlightCard" id="spreadCard">
+            <div>
+              <div class="label">Receita total gerada pelo Spread</div>
+              <div class="value mono" id="spreadTotal">—</div>
             </div>
+
+            <div class="spreadMini">
+              <canvas id="spread3m"></canvas>
+            </div>
+
+            <div class="hint">
+              Gráfico mostra os <b>últimos 3 meses</b> (mock). Quando plugar sua API, preencha <span class="mono">spread</span> por linha/transação e o painel soma automaticamente.
+            </div>
+          </div>
+        </div>
+
+        <div class="charts-row">
+          <div class="card section">
+            <div class="chartTitle"><span>Ranking de Bandeiras</span><span class="muted" style="font-size:12px">volume</span></div>
+            <div class="chartWrap small"><canvas id="donutBrands"></canvas></div>
+          </div>
+
+          <div class="card section">
+            <div class="chartTitle"><span>Transações por Status</span><span class="muted" style="font-size:12px">Liquidado x Agendado</span></div>
+            <div class="chartWrap small"><canvas id="donutStatus"></canvas></div>
           </div>
         </div>
 
         <div class="card section" style="margin-top:14px">
-          <div class="panel-head">
-            <div>
-              <h3>Distribuição por bandeira</h3>
-              <div class="meta">Participação aproximada sobre o volume do período selecionado .</div>
-            </div>
-            <div class="panel-actions">
-              <button class="btn ghost" id="btnToggleBars">⇄ Alternar</button>
-            </div>
-          </div>
-          <div class="chartWrap">
-            <svg class="chart" id="barChart" viewBox="0 0 900 280" role="img" aria-label="Gráfico de barras"></svg>
-          </div>
+          <div class="chartTitle"><span>Transações por tipo</span><span class="muted" style="font-size:12px">quantidade</span></div>
+          <div class="chartWrap small"><canvas id="barTypes"></canvas></div>
+        </div>
+
+        <div id="chartsNotice" class="muted" style="margin-top:12px;font-size:12px;display:none">
+          Charts não carregaram (provavelmente sem internet para o CDN). O restante do painel segue funcional.
         </div>
       </section>
 
-      <!-- PAGE: LIQUIDACOES -->
+      <!-- PAGE: LIQUIDAÇÕES -->
       <section class="page" id="page-liquidacoes">
         <div class="card section">
           <div class="panel-head">
             <div>
               <h3>Liquidações por estabelecimento</h3>
-              <div class="meta">Filtre por bandeira e tipo (Crédito, Débito, Parcelado e Pix). </div>
+              <div class="meta">Status permitidos: <b>Liquidado</b> e <b>Agendado</b>. Clique no estabelecimento para drill-down.</div>
             </div>
             <div class="panel-actions">
               <div class="control" style="padding:8px 10px;border-radius:12px">
@@ -477,7 +763,9 @@
               <thead>
                 <tr>
                   <th data-sort="estabelecimento">Estabelecimento</th>
-                  <th data-sort="volume">Valor Transacionado(Captura)</th>
+                  <th data-sort="banco">Banco</th>
+                  <th data-sort="volume">Volume (Bruto)</th>
+                  <th data-sort="taxa">Taxa média</th>
                   <th data-sort="liquido">Liquidado (Líquido)</th>
                   <th data-sort="spread">Spread</th>
                   <th data-sort="status">Status</th>
@@ -492,16 +780,30 @@
         </div>
       </section>
 
+      <!-- PAGE: RELATÓRIOS -->
+      <section class="page" id="page-relatorios">
+        <div class="card section">
+          <h3>Relatórios</h3>
+          <p class="meta" style="max-width:92ch">
+            Exportação rápida do que estiver filtrado (CSV/JSON) e impressão. Em produção, dá para incluir PDF mensal, CNAB e resumo por bandeira/loja.
+          </p>
 
-      <div class="tooltip" id="tooltip"></div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+            <button class="btn" id="exportCsv2">⬇️ Exportar CSV (tabela)</button>
+            <button class="btn ghost" id="downloadJson">⬇️ Baixar JSON</button>
+            <button class="btn ghost" id="print">🖨️ Imprimir</button>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
   <script>
     // ============================
-    // 
+    // Mock data (substitua pela sua API)
     // ============================
     const fmtUSD = new Intl.NumberFormat("en-US", { style:"currency", currency:"USD" });
+    const fmtBRL = new Intl.NumberFormat("pt-BR", { style:"currency", currency:"BRL" });
     const fmtNum = new Intl.NumberFormat("pt-BR");
     const today = new Date();
 
@@ -516,25 +818,28 @@
 
     const TYPE_LABEL = {
       ALL:"Todos",
-      CREDITO:"Crédito",
-      DEBITO:"Débito",
-      PARCELADO:"Crédito Parcelado",
+      CREDITO:"Crédito à vista",
+      DEBITO:"Débito à vista",
+      PARCELADO:"Crédito parcelado",
       PIX:"Pix"
     };
 
+    // Only two statuses allowed
+    const STATUS = { LIQUIDADO:"Liquidado", AGENDADO:"Agendado" };
+
     const estabs = [
-      { id:"E001", nome:"Mercado Bom Preço", cidade:"Recife", ativo:true },
-      { id:"E002", nome:"Farmácia Central", cidade:"Sorocaba", ativo:true },
-      { id:"E003", nome:"Bar do Julio (Bar Gay)", cidade:"Baixada Fluminense", ativo:true },
-      { id:"E004", nome:"Auto Center Prime", cidade:"Fortaleza", ativo:true },
-      { id:"E005", nome:"Loja Tech Express", cidade:"Orlando", ativo:true },
-      { id:"E006", nome:"Padaria da Esquina", cidade:"Clermont", ativo:true },
-      { id:"E007", nome:"Boutique Aurora", cidade:"Lake Buena Vista", ativo:true },
-      { id:"E008", nome:"Pet Shop Feliz", cidade:"Orlando", ativo:true },
-      { id:"E009", nome:"Café & Companhia", cidade:"Orlando", ativo:false },
-      { id:"E010", nome:"Mercadinho do Bairro", cidade:"Apopka", ativo:true },
-      { id:"E011", nome:"Academia Movimento", cidade:"Orlando", ativo:true },
-      { id:"E012", nome:"Studio Beauty Glow", cidade:"Orlando", ativo:true },
+      { id:"E001", nome:"Mercado Bom Preço", cidade:"Orlando", ativo:true, banco:"X-Pay" },
+      { id:"E002", nome:"Farmácia Central", cidade:"Kissimmee", ativo:true, banco:"Banco Itaú" },
+      { id:"E003", nome:"Restaurante Sabor BR", cidade:"Orlando", ativo:true, banco:"X-Pay" },
+      { id:"E004", nome:"Auto Center Prime", cidade:"Winter Park", ativo:true, banco:"Bank of America" },
+      { id:"E005", nome:"Loja Tech Express", cidade:"Orlando", ativo:true, banco:"X-Pay" },
+      { id:"E006", nome:"Padaria da Esquina", cidade:"Clermont", ativo:true, banco:"Chase" },
+      { id:"E007", nome:"Boutique Aurora", cidade:"Lake Buena Vista", ativo:true, banco:"X-Pay" },
+      { id:"E008", nome:"Pet Shop Feliz", cidade:"Orlando", ativo:true, banco:"Wells Fargo" },
+      { id:"E009", nome:"Café & Companhia", cidade:"Orlando", ativo:false, banco:"Banco Bradesco" },
+      { id:"E010", nome:"Mercadinho do Bairro", cidade:"Apopka", ativo:true, banco:"X-Pay" },
+      { id:"E011", nome:"Academia Movimento", cidade:"Orlando", ativo:true, banco:"X-Pay" },
+      { id:"E012", nome:"Studio Beauty Glow", cidade:"Orlando", ativo:true, banco:"Citibank" },
     ];
 
     function dateISO(d){ return d.toISOString().slice(0,10); }
@@ -542,8 +847,8 @@
     function rand(min, max){ return Math.random()*(max-min)+min; }
     function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-    // daily base series for charts
-    const seriesDays = 120;
+    // daily base series for charts (same idea as your original)
+    const seriesDays = 160;
     const startSeries = addDays(today, -seriesDays+1);
     const daily = [];
     for(let i=0;i<seriesDays;i++){
@@ -564,7 +869,7 @@
     }, {});
 
     // ============================
-    // State + bindings
+    // DOM bindings
     // ============================
     const els = {
       from: document.getElementById("from"),
@@ -572,21 +877,30 @@
       bandeira: document.getElementById("bandeira"),
       tipo: document.getElementById("tipo"),
       apply: document.getElementById("apply"),
-      reset: document.getElementById("reset"),
+      quickSearch: document.getElementById("quickSearch"),
       pageTitle: document.getElementById("pageTitle"),
       pageDesc: document.getElementById("pageDesc"),
+
+      kpiLiqHoje: document.getElementById("kpiLiqHoje"),
+      kpiALiquidar: document.getElementById("kpiALiquidar"),
       kpiLiquidado: document.getElementById("kpiLiquidado"),
       kpiLiquidadoDelta: document.getElementById("kpiLiquidadoDelta"),
       kpiEstabs: document.getElementById("kpiEstabs"),
       kpiInativos: document.getElementById("kpiInativos"),
       kpiVolume: document.getElementById("kpiVolume"),
       kpiTaxa: document.getElementById("kpiTaxa"),
-      kpiMedia: document.getElementById("kpiMedia"),
-      kpiTicket: document.getElementById("kpiTicket"),
+      kpiSaldoBU: document.getElementById("kpiSaldoBU"),
+      kpiTransacoes: document.getElementById("kpiTransacoes"),
+      kpiTicketMedio: document.getElementById("kpiTicketMedio"),
+      kpiTotalTrans: document.getElementById("kpiTotalTrans"),
+      kpiSpread: document.getElementById("kpiSpread"),
+
       spreadTotal: document.getElementById("spreadTotal"),
-      lineChart: document.getElementById("lineChart"),
-      barChart: document.getElementById("barChart"),
-      btnToggleBars: document.getElementById("btnToggleBars"),
+
+      chipLiquidado: document.getElementById("chipLiquidado"),
+      chipVolume: document.getElementById("chipVolume"),
+      chipTaxa: document.getElementById("chipTaxa"),
+
       tbody: document.getElementById("tbody"),
       tableFooter: document.getElementById("tableFooter"),
       search: document.getElementById("search"),
@@ -594,9 +908,23 @@
       exportCsv2: document.getElementById("exportCsv2"),
       downloadJson: document.getElementById("downloadJson"),
       print: document.getElementById("print"),
-      tooltip: document.getElementById("tooltip"),
-      chips: Array.from(document.querySelectorAll(".chip")),
-      navButtons: Array.from(document.querySelectorAll(".nav button")),
+
+      chartsNotice: document.getElementById("chartsNotice"),
+
+      btnMenu: document.getElementById("btnMenu"),
+      drawer: document.getElementById("drawer"),
+      navDesktop: document.getElementById("navDesktop"),
+      navMobile: document.getElementById("navMobile"),
+
+      // modal
+      modalBack: document.getElementById("modalBack"),
+      btnCloseModal: document.getElementById("btnCloseModal"),
+      btnGoLiquidacoes: document.getElementById("btnGoLiquidacoes"),
+      modalTitle: document.getElementById("modalTitle"),
+      modalSub: document.getElementById("modalSub"),
+      mStatus: document.getElementById("mStatus"),
+      mBanco: document.getElementById("mBanco"),
+      mLiquidado: document.getElementById("mLiquidado"),
     };
 
     const pages = {
@@ -621,9 +949,162 @@
       sortKey: "liquido",
       sortDir: "desc",
       chartSeries: "liquidado",
-      barMode: "volume"
+      selectedEstabId: null
     };
 
+    // ============================
+    // Navigation
+    // ============================
+    const navItems = [
+      { key:"dashboard", label:"Dashboard", icon:"📊" },
+      { key:"liquidacoes", label:"Liquidações", icon:"💸" },
+      { key:"relatorios", label:"Relatórios", icon:"📄" },
+    ];
+
+    function buildNav(container){
+      container.innerHTML = "";
+      navItems.forEach(item=>{
+        const btn = document.createElement("button");
+        btn.dataset.page = item.key;
+        btn.className = item.key === state.page ? "active" : "";
+        btn.innerHTML = `
+          <div class="left">
+            <div class="ico">${item.icon}</div>
+            <span>${item.label}</span>
+          </div>
+          <span class="muted" style="font-size:12px">›</span>
+        `;
+        btn.addEventListener("click", ()=>{
+          go(item.key);
+          closeDrawer();
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    function go(page){
+      state.page = page;
+      Object.entries(pages).forEach(([k,el])=> el.classList.toggle("active", k===page));
+      els.pageTitle.textContent = pageMeta[page].title;
+      els.pageDesc.textContent = pageMeta[page].desc;
+      buildNav(els.navDesktop);
+      buildNav(els.navMobile);
+    }
+
+    // Drawer
+    function openDrawer(){ els.drawer.classList.add("open"); }
+    function closeDrawer(){ els.drawer.classList.remove("open"); }
+    els.btnMenu.addEventListener("click", openDrawer);
+    els.drawer.addEventListener("click", (e)=>{ if(e.target === els.drawer) closeDrawer(); });
+
+    // ============================
+    // Modal (Drill-down)
+    // ============================
+    let mLine=null, mBars=null;
+
+    function destroyChart(ch){ try{ ch && ch.destroy && ch.destroy(); }catch(e){} return null; }
+
+    function openModalForEstab(estabId){
+      state.selectedEstabId = estabId;
+      const e = estabs.find(x=>x.id===estabId);
+      if(!e) return;
+
+      // Pull row aggregate
+      const row = state.rows.find(r=>r.estabId===estabId);
+      els.modalTitle.textContent = `${e.nome} • ${e.cidade}`;
+      els.modalSub.textContent = `${e.id} • ${e.ativo ? "Ativo" : "Inativo"} • Período: ${state.from} → ${state.to}`;
+      els.mStatus.textContent = row?.status ?? "—";
+      els.mBanco.textContent = e.banco;
+      els.mLiquidado.textContent = row ? fmtUSD.format(row.liquido) : "—";
+
+      // Build 14-day history ending at state.to
+      const toD = new Date(state.to + "T00:00:00");
+      const labels = [];
+      const vals = [];
+      for(let i=13;i>=0;i--){
+        const d = addDays(toD, -i);
+        const iso = dateISO(d);
+        const day = daily.find(x=>x.date===iso);
+        const w = weights[e.id] || 1;
+        const vol = day ? (day.volume * (w/estabs.length) * 6) : 0;
+        const taxa = day ? day.taxa : 0.024;
+        const liq = vol * (1 - taxa) - 40;
+        labels.push(iso.slice(8,10)+"/"+iso.slice(5,7));
+        vals.push(Math.max(0, liq));
+      }
+
+      // Mock type split for estab
+      const totalTx = Math.max(1, Math.round((row?.txCount || 0)));
+      const split = state.type !== "ALL"
+        ? {CREDITO:0.12, DEBITO:0.12, PIX:0.12, PARCELADO:0.12, [state.type]:0.64}
+        : {CREDITO:0.38, DEBITO:0.26, PIX:0.18, PARCELADO:0.18};
+
+      const typeLabels = ["Crédito à vista","Débito à vista","Pix","Crédito parcelado"];
+      const typeKeys = ["CREDITO","DEBITO","PIX","PARCELADO"];
+      const counts = typeKeys.map(k=> Math.max(1, Math.round(totalTx*(split[k]||0.2))));
+
+      // Render charts (if Chart exists)
+      if(typeof Chart !== "undefined"){
+        mLine = destroyChart(mLine);
+        mBars = destroyChart(mBars);
+
+        mLine = new Chart(document.getElementById("mLine").getContext("2d"),{
+          type:"line",
+          data:{ labels, datasets:[{
+            data: vals,
+            borderColor:"rgba(34,197,94,.95)",
+            backgroundColor:"rgba(34,197,94,.12)",
+            fill:true,
+            tension:.35,
+            pointRadius:0,
+            borderWidth:2.4,
+          }]},
+          options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{ legend:{display:false} },
+            scales:{
+              x:{ ticks:{ color:"rgba(255,255,255,.65)" }, grid:{ color:"rgba(255,255,255,.05)" } },
+              y:{ ticks:{ color:"rgba(255,255,255,.65)" }, grid:{ color:"rgba(255,255,255,.05)" } }
+            }
+          }
+        });
+
+        mBars = new Chart(document.getElementById("mBars").getContext("2d"),{
+          type:"bar",
+          data:{ labels: typeLabels, datasets:[{ data: counts, borderWidth:0 }]},
+          options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            indexAxis:"y",
+            plugins:{ legend:{display:false} },
+            scales:{
+              x:{ ticks:{ color:"rgba(255,255,255,.65)" }, grid:{ color:"rgba(255,255,255,.05)" } },
+              y:{ ticks:{ color:"rgba(255,255,255,.75)" }, grid:{ display:false } }
+            }
+          }
+        });
+      }
+
+      els.modalBack.classList.add("open");
+    }
+
+    function closeModal(){
+      els.modalBack.classList.remove("open");
+    }
+
+    els.btnCloseModal.addEventListener("click", closeModal);
+    els.modalBack.addEventListener("click", (e)=>{ if(e.target === els.modalBack) closeModal(); });
+    els.btnGoLiquidacoes.addEventListener("click", ()=>{
+      closeModal();
+      go("liquidacoes");
+      // highlight search
+      setTimeout(()=>{ els.search?.focus(); }, 120);
+    });
+
+    // ============================
+    // Filters behavior
+    // ============================
     function setDefaultDates(){
       const to = new Date(today);
       const from = addDays(today, -30+1);
@@ -633,22 +1114,12 @@
       state.to = els.to.value;
     }
 
-    function formatDelta(x){
-      const sign = x >= 0 ? "+" : "";
-      return `${sign}${(x*100).toFixed(1)}%`;
-    }
-    function sum(arr, key){ return arr.reduce((acc, r)=>acc + (r[key]||0), 0); }
-
-    // ============================
-    // Brand/Type behavior (the thing you asked)
-    // ============================
     function syncTipoOptions(){
       const brand = els.bandeira.value;
       const allowed = (brand === "ALL")
         ? ["ALL","CREDITO","DEBITO","PARCELADO","PIX"]
         : ["ALL", ...TYPES_BY_BRAND[brand]];
 
-      // rebuild options
       const cur = els.tipo.value;
       els.tipo.innerHTML = "";
       allowed.forEach(v=>{
@@ -658,11 +1129,9 @@
         els.tipo.appendChild(opt);
       });
 
-      // keep selection if possible
       if(allowed.includes(cur)) els.tipo.value = cur;
       else els.tipo.value = "ALL";
     }
-
     els.bandeira.addEventListener("change", syncTipoOptions);
 
     // ============================
@@ -676,6 +1145,13 @@
       });
     }
 
+    // status rule: if last liquidation date within last 2 days -> Agendado, else Liquidado (mock)
+    function calcStatus(lastDateISO){
+      const last = new Date((lastDateISO) + "T00:00:00");
+      const cutoff = addDays(new Date(today), -2);
+      return (last >= cutoff) ? STATUS.AGENDADO : STATUS.LIQUIDADO;
+    }
+
     function buildSettlementRows(fromISO, toISO, brandFilter="ALL", typeFilter="ALL"){
       const from = new Date(fromISO);
       const to = new Date(toISO);
@@ -684,7 +1160,7 @@
       for(const e of estabs){
         let vol = 0, liquido = 0, taxaAcc = 0, taxaCount = 0, lastDate = null;
         let spread = 0;
-        let statusScore = 0;
+        let txCount = 0;
 
         for(const day of daily){
           const d = new Date(day.date+"T00:00:00");
@@ -693,18 +1169,15 @@
           const w = weights[e.id];
           const estVolBase = day.volume * (w/estabs.length) * rand(0.85,1.15) * 6;
 
-          // pick a brand and a type consistent with brand
           const brand = pick(BRANDS);
           const type = pick(TYPES_BY_BRAND[brand]);
 
-          // filters
           if(brandFilter !== "ALL" && brand !== brandFilter) continue;
           if(typeFilter !== "ALL" && type !== typeFilter) continue;
 
           const estTaxa = Math.max(0.017, Math.min(0.038, day.taxa + rand(-0.004, 0.004)));
           const estLiq = estVolBase * (1 - estTaxa) - rand(5, 90);
 
-          // MOCK spread (placeholder): in produção isso vem do seu back
           const estSpread = estVolBase * rand(0.0015, 0.0045);
 
           vol += estVolBase;
@@ -713,30 +1186,30 @@
           taxaAcc += estTaxa;
           taxaCount++;
 
-          statusScore += rand(0,1) * (brand === "Pix" ? 0.2 : 0.6);
+          const ticket = rand(70, 180);
+          txCount += Math.max(1, Math.round(estVolBase / ticket));
+
           if(!lastDate || d > new Date(lastDate)) lastDate = day.date;
         }
 
         if(vol <= 0) continue;
 
         const taxaMed = taxaCount ? (taxaAcc/taxaCount) : 0.024;
-        const crescimento = rand(-0.22, 0.32) + (e.ativo ? rand(-0.03, 0.07) : rand(-0.25, -0.05));
-
-        let status = "Liquidado";
-        if(statusScore > 42) status = "Divergência";
-        else if(statusScore > 30) status = "Processando";
+        const status = calcStatus(lastDate || toISO);
 
         rows.push({
           estabelecimento: `${e.nome} • ${e.cidade}`,
           estabId: e.id,
+          banco: e.banco,
+          bancoXPay: (String(e.banco).toLowerCase() === "x-pay" || String(e.banco).toLowerCase() === "xpay"),
           volume: vol,
           liquido: liquido,
           spread: spread,
           taxa: taxaMed,
           status: status,
-          crescimento: crescimento,
           ultima: lastDate || toISO,
-          ativo: e.ativo
+          ativo: e.ativo,
+          txCount
         });
       }
 
@@ -744,32 +1217,26 @@
     }
 
     // ============================
-    // Charts (SVG)
+    // Helpers
     // ============================
-    function clearSVG(svg){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
-    function svgEl(tag, attrs={}){
-      const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
-      for(const k in attrs) el.setAttribute(k, attrs[k]);
-      return el;
+    function formatDelta(x){
+      const sign = x >= 0 ? "+" : "";
+      return `${sign}${(x*100).toFixed(1)}%`;
     }
-    function drawGrid(svg, w, h, pad){
-      const g = svgEl("g");
-      const rows = 4, cols = 6;
-      for(let i=0;i<=rows;i++){
-        const y = pad + (h-2*pad)*(i/rows);
-        g.appendChild(svgEl("line",{x1:pad,y1:y,x2:w-pad,y2:y, stroke:"rgba(255,255,255,.06)","stroke-width":"1"}));
-      }
-      for(let i=0;i<=cols;i++){
-        const x = pad + (w-2*pad)*(i/cols);
-        g.appendChild(svgEl("line",{x1:x,y1:pad,x2:x,y2:h-pad, stroke:"rgba(255,255,255,.04)","stroke-width":"1"}));
-      }
-      svg.appendChild(g);
+    function sum(arr, key){ return arr.reduce((acc, r)=>acc + (r[key]||0), 0); }
+
+    // ============================
+    // Charts (Chart.js)
+    // ============================
+    let chartLine=null, chartDonutBrands=null, chartDonutStatus=null, chartBarTypes=null, chartSpread3m=null;
+
+    function ensureChartsAvailable(){
+      const ok = (typeof Chart !== "undefined");
+      els.chartsNotice.style.display = ok ? "none" : "block";
+      return ok;
     }
-    function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
 
-    let currentChartData = { cur:[], prev:[], days:[] };
-
-    function buildChartData(fromISO, toISO, seriesKey){
+    function buildLineData(fromISO, toISO, seriesKey){
       const slice = getDailySlice(fromISO, toISO);
       const days = slice.map(d=>d.date);
       const len = days.length;
@@ -785,194 +1252,204 @@
       const prev = prevSlice.map(d=>d[k]);
       while(prev.length < cur.length) prev.unshift(prev[0] ?? cur[0] ?? 0);
 
-      currentChartData = { cur, prev, days };
-      return currentChartData;
-    }
-
-    function niceNumber(v){
-      if(state.chartSeries === "taxa") return (v*100).toFixed(2) + "%";
-      return fmtUSD.format(v);
-    }
-
-    function showTooltipFromPoint(px, py, label, cur, prev){
-      const x = clamp(px+14, 10, window.innerWidth-260);
-      const y = clamp(py+14, 10, window.innerHeight-120);
-      els.tooltip.style.left = x + "px";
-      els.tooltip.style.top = y + "px";
-      const valCur = (state.chartSeries === "taxa") ? (cur*100).toFixed(2)+"%" : fmtUSD.format(cur);
-      const valPrev = (state.chartSeries === "taxa") ? (prev*100).toFixed(2)+"%" : fmtUSD.format(prev);
-      els.tooltip.innerHTML = `
-        <b>${label}</b>
-        <div class="row"><span>Atual</span><span>${valCur}</span></div>
-        <div class="row"><span>Anterior</span><span>${valPrev}</span></div>
-      `;
-      els.tooltip.style.opacity = 1;
-    }
-    function hideTooltip(){ els.tooltip.style.opacity = 0; }
-
-    function drawLineChart(svg, seriesA, seriesB, labels){
-      clearSVG(svg);
-      const vb = svg.viewBox.baseVal;
-      const w = vb.width, h = vb.height;
-      const pad = 36;
-      drawGrid(svg,w,h,pad);
-
-      const all = seriesA.concat(seriesB);
-      const min = Math.min(...all);
-      const max = Math.max(...all);
-      const rng = (max-min) || 1;
-
-      const x = (i)=> pad + (w-2*pad)*(i/(seriesA.length-1 || 1));
-      const y = (v)=> pad + (h-2*pad)*(1 - ((v-min)/rng));
-
-      function pathFrom(series){
-        let d = "";
-        series.forEach((v,i)=>{ d += (i===0? "M":"L") + x(i).toFixed(2) + " " + y(v).toFixed(2) + " "; });
-        return d.trim();
-      }
-
-      const defs = svgEl("defs");
-      const grad = svgEl("linearGradient",{id:"gA",x1:"0",y1:"0",x2:"0",y2:"1"});
-      grad.appendChild(svgEl("stop",{offset:"0%","stop-color":"rgba(34,197,94,.28)"}));
-      grad.appendChild(svgEl("stop",{offset:"100%","stop-color":"rgba(34,197,94,.02)"}));
-      defs.appendChild(grad);
-
-      const grad2 = svgEl("linearGradient",{id:"gB",x1:"0",y1:"0",x2:"0",y2:"1"});
-      grad2.appendChild(svgEl("stop",{offset:"0%","stop-color":"rgba(148,163,184,.20)"}));
-      grad2.appendChild(svgEl("stop",{offset:"100%","stop-color":"rgba(148,163,184,.02)"}));
-      defs.appendChild(grad2);
-      svg.appendChild(defs);
-
-      const dA = pathFrom(seriesA);
-      const areaA = dA + ` L ${x(seriesA.length-1)} ${h-pad} L ${x(0)} ${h-pad} Z`;
-      svg.appendChild(svgEl("path",{d:areaA, fill:"url(#gA)"}));
-
-      const dB = pathFrom(seriesB);
-      const areaB = dB + ` L ${x(seriesB.length-1)} ${h-pad} L ${x(0)} ${h-pad} Z`;
-      svg.appendChild(svgEl("path",{d:areaB, fill:"url(#gB)"}));
-
-      svg.appendChild(svgEl("path",{d:dB, fill:"none", stroke:"rgba(148,163,184,.85)","stroke-width":"2.2"}));
-      svg.appendChild(svgEl("path",{d:dA, fill:"none", stroke:"rgba(34,197,94,.95)","stroke-width":"2.6"}));
-
-      const hitG = svgEl("g");
-      seriesA.forEach((v,i)=>{
-        const cx = x(i), cy = y(v);
-        const hit = svgEl("circle",{cx, cy, r:"12", fill:"transparent"});
-        const label = labels[i] || "";
-        hit.addEventListener("mouseenter", (e)=> showTooltipFromPoint(e.clientX, e.clientY, label, seriesA[i], seriesB[i]));
-        hit.addEventListener("mousemove", (e)=> showTooltipFromPoint(e.clientX, e.clientY, label, seriesA[i], seriesB[i]));
-        hit.addEventListener("mouseleave", hideTooltip);
-        hitG.appendChild(hit);
-      });
-      svg.appendChild(hitG);
-
-      const t1 = svgEl("text",{x:pad, y:pad-10, fill:"rgba(255,255,255,.65)", "font-size":"11"});
-      t1.textContent = niceNumber(max);
-      const t2 = svgEl("text",{x:pad, y:h-pad+22, fill:"rgba(255,255,255,.65)", "font-size":"11"});
-      t2.textContent = niceNumber(min);
-      svg.appendChild(t1); svg.appendChild(t2);
-    }
-
-    function drawBarChart(svg, data){
-      clearSVG(svg);
-      const vb = svg.viewBox.baseVal;
-      const w = vb.width, h = vb.height;
-      const pad = 46;
-      drawGrid(svg,w,h,pad);
-
-      const labels = data.map(d=>d.label);
-      const vals = data.map(d=>d.value);
-      const max = Math.max(...vals, 1);
-      const barW = (w-2*pad) / (labels.length*1.35);
-      const gap = barW*0.35;
-
-      data.forEach((d,i)=>{
-        const x = pad + i*(barW+gap);
-        const bh = (h-2*pad) * (d.value/max);
-        const y = h-pad - bh;
-
-        const rect = svgEl("rect",{ x, y, width:barW, height:bh, rx:"12", ry:"12",
-          fill:"rgba(34,197,94,.55)", stroke:"rgba(34,197,94,.25)", "stroke-width":"1" });
-        rect.addEventListener("mouseenter", (e)=>{
-          const val = state.barMode === "share" ? (d.value*100).toFixed(1)+"%" : fmtUSD.format(d.value);
-          els.tooltip.style.opacity = 1;
-          els.tooltip.innerHTML = `<b>${d.label}</b><div class="row"><span>${state.barMode === "share" ? "Participação" : "Volume"}</span><span>${val}</span></div>`;
-          els.tooltip.style.left = clamp(e.clientX+14, 10, window.innerWidth-260)+"px";
-          els.tooltip.style.top = clamp(e.clientY+14, 10, window.innerHeight-120)+"px";
-        });
-        rect.addEventListener("mousemove", (e)=>{
-          els.tooltip.style.left = clamp(e.clientX+14, 10, window.innerWidth-260)+"px";
-          els.tooltip.style.top = clamp(e.clientY+14, 10, window.innerHeight-120)+"px";
-        });
-        rect.addEventListener("mouseleave", hideTooltip);
-        svg.appendChild(rect);
-
-        const tx = svgEl("text",{x:x+barW/2, y:h-pad+22, fill:"rgba(255,255,255,.72)","font-size":"11","text-anchor":"middle"});
-        tx.textContent = d.label;
-        svg.appendChild(tx);
-      });
-    }
-
-    // ============================
-    // Rendering
-    // ============================
-    function renderKpis(rows){
-      const liquidado = sum(rows,"liquido");
-      const volume = sum(rows,"volume");
-      const spread = sum(rows,"spread");
-      const taxaMed = rows.length ? sum(rows,"taxa")/rows.length : 0;
-      const ativos = estabs.filter(e=>e.ativo).length;
-      const inativos = estabs.filter(e=>!e.ativo).length;
-      const mediaLoja = ativos ? liquidado/ativos : 0;
-      const ticketMed = rows.length ? volume/rows.length : 0;
-
-      const chart = buildChartData(state.from, state.to, "liquidado");
-      const curTot = chart.cur.reduce((a,b)=>a+b,0);
-      const prevTot = chart.prev.reduce((a,b)=>a+b,0);
-      const delta = prevTot ? (curTot-prevTot)/prevTot : 0;
-
-      els.kpiLiquidado.textContent = fmtUSD.format(liquidado);
-      els.kpiVolume.textContent = fmtUSD.format(volume);
-      els.kpiTaxa.textContent = (taxaMed*100).toFixed(2) + "%";
-      els.kpiEstabs.textContent = fmtNum.format(ativos);
-      els.kpiInativos.textContent = fmtNum.format(inativos);
-      els.kpiMedia.textContent = fmtUSD.format(mediaLoja);
-      els.kpiTicket.textContent = fmtUSD.format(ticketMed);
-      els.spreadTotal.textContent = fmtUSD.format(spread);
-
-      const b = els.kpiLiquidadoDelta;
-      b.textContent = formatDelta(delta);
-      b.classList.remove("good","bad","warn");
-      if(delta >= 0.03) b.classList.add("good");
-      else if(delta <= -0.03) b.classList.add("bad");
-      else b.classList.add("warn");
-    }
-
-    function renderLineChart(){
-      const chart = buildChartData(state.from, state.to, state.chartSeries);
-      const labels = chart.days.map(iso=>{
+      const labels = days.map(iso=>{
         const d = new Date(iso+"T00:00:00");
         const dd = String(d.getDate()).padStart(2,"0");
         const mm = String(d.getMonth()+1).padStart(2,"0");
         return `${dd}/${mm}`;
       });
-      drawLineChart(els.lineChart, chart.cur, chart.prev, labels);
+
+      return { labels, cur, prev };
     }
 
-    function renderBarChart(rows){
-      const base = {"Visa":0.28,"Mastercard":0.30,"Elo":0.18,"Amex":0.06,"Pix":0.18};
-      const totalVol = sum(rows,"volume") || 1;
-      const data = BRANDS.map(b=>{
-        let v = totalVol * base[b] * rand(0.9,1.1);
-        return { label:b, value:v };
+    function renderCharts(rows){
+      if(!ensureChartsAvailable()) return;
+
+      // Line chart
+      const {labels, cur, prev} = buildLineData(state.from, state.to, state.chartSeries);
+
+      chartLine = destroyChart(chartLine);
+      chartLine = new Chart(document.getElementById("lineChart").getContext("2d"), {
+        type: "line",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Anterior",
+              data: prev,
+              borderColor: "rgba(148,163,184,.85)",
+              backgroundColor: "rgba(148,163,184,.08)",
+              fill: true,
+              tension: 0.38,
+              borderWidth: 2,
+              pointRadius: 0,
+            },
+            {
+              label: "Atual",
+              data: cur,
+              borderColor: "rgba(34,197,94,.95)",
+              backgroundColor: "rgba(34,197,94,.12)",
+              fill: true,
+              tension: 0.38,
+              borderWidth: 2.4,
+              pointRadius: 0,
+            }
+          ]
+        },
+        options: {
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{
+            legend:{ display:false },
+            tooltip:{
+              callbacks:{
+                label:(ctx)=>{
+                  const v = ctx.parsed.y ?? 0;
+                  if(state.chartSeries === "taxa") return `${ctx.dataset.label}: ${(v*100).toFixed(2)}%`;
+                  return `${ctx.dataset.label}: ${fmtUSD.format(v)}`;
+                }
+              }
+            }
+          },
+          scales:{
+            x:{ ticks:{ color:"rgba(255,255,255,.65)" }, grid:{ color:"rgba(255,255,255,.05)" } },
+            y:{ ticks:{ color:"rgba(255,255,255,.65)" }, grid:{ color:"rgba(255,255,255,.05)" } }
+          }
+        }
       });
-      if(state.barMode === "share"){
-        const s = data.reduce((a,b)=>a+b.value,0) || 1;
-        data.forEach(d=> d.value = d.value/s);
-      }
-      drawBarChart(els.barChart, data);
+
+      // Donut brands (volume share - mock)
+      const totalVol = sum(rows,"volume") || 1;
+      const base = {"Visa":0.28,"Mastercard":0.30,"Elo":0.18,"Amex":0.06,"Pix":0.18};
+      const brandVals = BRANDS.map(b=> totalVol * base[b] * rand(0.95,1.05));
+
+      chartDonutBrands = destroyChart(chartDonutBrands);
+      chartDonutBrands = new Chart(document.getElementById("donutBrands").getContext("2d"), {
+        type:"doughnut",
+        data:{
+          labels: BRANDS,
+          datasets:[{
+            data: brandVals,
+            borderWidth: 0,
+            hoverOffset: 6
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{
+            legend:{
+              position:"bottom",
+              labels:{ color:"rgba(255,255,255,.75)", boxWidth:10, boxHeight:10, usePointStyle:true }
+            },
+            tooltip:{ callbacks:{ label:(ctx)=> `${ctx.label}: ${fmtUSD.format(ctx.parsed)}` } }
+          },
+          cutout:"62%"
+        }
+      });
+
+      // Donut status (Liquidado x Agendado) based on txCount
+      let txLiq = 0, txAg = 0;
+      rows.forEach(r=>{
+        if(r.status === STATUS.LIQUIDADO) txLiq += r.txCount || 0;
+        else txAg += r.txCount || 0;
+      });
+
+      chartDonutStatus = destroyChart(chartDonutStatus);
+      chartDonutStatus = new Chart(document.getElementById("donutStatus").getContext("2d"), {
+        type:"doughnut",
+        data:{
+          labels:[STATUS.LIQUIDADO, STATUS.AGENDADO],
+          datasets:[{
+            data:[txLiq || 1, txAg || 1],
+            borderWidth:0,
+            hoverOffset:6
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{
+            legend:{ position:"bottom", labels:{ color:"rgba(255,255,255,.75)", boxWidth:10, boxHeight:10, usePointStyle:true } }
+          },
+          cutout:"62%"
+        }
+      });
+
+      // Bar types (tx count per type)
+      const types = ["CREDITO","DEBITO","PIX","PARCELADO"];
+      const baseCount = sum(rows,"txCount") || 1;
+      const weightsType = (state.type !== "ALL")
+        ? (t)=> (t === state.type ? 0.62 : 0.12)
+        : (t)=> ({CREDITO:0.38, DEBITO:0.26, PIX:0.18, PARCELADO:0.18}[t] || 0.2);
+
+      const counts = types.map(t=> Math.max(1, Math.round(baseCount * weightsType(t) * rand(0.92,1.08))));
+
+      chartBarTypes = destroyChart(chartBarTypes);
+      chartBarTypes = new Chart(document.getElementById("barTypes").getContext("2d"), {
+        type:"bar",
+        data:{
+          labels: types.map(t=>TYPE_LABEL[t]),
+          datasets:[{ data: counts, borderWidth:0 }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          indexAxis:"y",
+          plugins:{ legend:{ display:false } },
+          scales:{
+            x:{ ticks:{ color:"rgba(255,255,255,.65)" }, grid:{ color:"rgba(255,255,255,.05)" } },
+            y:{ ticks:{ color:"rgba(255,255,255,.75)" }, grid:{ display:false } }
+          }
+        }
+      });
+
+      // Spread last 3 months horizontal bars
+      const months = last3MonthsLabels();
+      const spread3 = months.map((m, idx)=> {
+        // mock: distribute current spread with some variation
+        const s = sum(rows,"spread") || 1;
+        const factor = [0.86, 0.95, 1.00][idx] * rand(0.95,1.05);
+        return Math.max(1, s * factor);
+      });
+
+      chartSpread3m = destroyChart(chartSpread3m);
+      chartSpread3m = new Chart(document.getElementById("spread3m").getContext("2d"),{
+        type:"bar",
+        data:{
+          labels: months,
+          datasets:[{ data: spread3, borderWidth:0 }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          indexAxis:"y",
+          plugins:{
+            legend:{ display:false },
+            tooltip:{ callbacks:{ label:(ctx)=> fmtUSD.format(ctx.parsed.x || 0) } }
+          },
+          scales:{
+            x:{ ticks:{ color:"rgba(255,255,255,.65)", callback:(v)=>"" }, grid:{ color:"rgba(255,255,255,.05)" } },
+            y:{ ticks:{ color:"rgba(255,255,255,.75)" }, grid:{ display:false } }
+          }
+        }
+      });
     }
 
+    function last3MonthsLabels(){
+      const base = new Date(state.to + "T00:00:00");
+      const labels = [];
+      for(let i=2;i>=0;i--){
+        const d = new Date(base);
+        d.setMonth(d.getMonth()-i);
+        labels.push(d.toLocaleString("pt-BR",{month:"short"}).replace(".","").toUpperCase());
+      }
+      return labels;
+    }
+
+    // ============================
+    // Table
+    // ============================
     function sortRows(rows){
       const key = state.sortKey;
       const dir = state.sortDir === "asc" ? 1 : -1;
@@ -990,36 +1467,129 @@
       let rows = [...state.rows];
       const q = (els.search?.value || "").trim().toLowerCase();
       if(q){
-        rows = rows.filter(r=> r.estabelecimento.toLowerCase().includes(q) || r.estabId.toLowerCase().includes(q));
+        rows = rows.filter(r=> r.estabelecimento.toLowerCase().includes(q) || r.estabId.toLowerCase().includes(q) || (r.banco||"").toLowerCase().includes(q));
       }
       rows = sortRows(rows);
 
       els.tbody.innerHTML = "";
       rows.forEach(r=>{
         const tr = document.createElement("tr");
-        const statusClass = r.status === "Liquidado" ? "liquidado" : (r.status === "Processando" ? "processando" : "divergencia");
-        const growBadge = r.crescimento >= 0 ? "good" : "bad";
+        const statusClass = (r.status === STATUS.LIQUIDADO) ? "liquidado" : "agendado";
+        const bankClass = r.bancoXPay ? "xpay" : "other";
         tr.innerHTML = `
           <td>
             <div style="display:flex;flex-direction:column;gap:3px">
-              <span><b>${r.estabelecimento}</b></span>
+              <span><a class="link" data-estab="${r.estabId}">${r.estabelecimento}</a></span>
               <span class="muted mono">${r.estabId} • ${r.ativo ? "Ativo" : "Inativo"}</span>
             </div>
+          </td>
+          <td>
+            <span class="bankPill ${bankClass}"><span class="dot"></span>${r.banco}</span>
           </td>
           <td class="mono">${fmtUSD.format(r.volume)}</td>
           <td class="mono">${(r.taxa*100).toFixed(2)}%</td>
           <td class="mono"><b>${fmtUSD.format(r.liquido)}</b></td>
           <td class="mono"><b>${fmtUSD.format(r.spread)}</b></td>
-          <td><span class="status ${statusClass}"><span class="sDot"></span>${r.status}</span></td>
-          <td><span class="badge ${growBadge}">${formatDelta(r.crescimento)}</span></td>
+          <td><span class="statusPill ${statusClass}"><span class="dot"></span>${r.status}</span></td>
           <td class="mono">${r.ultima}</td>
         `;
         els.tbody.appendChild(tr);
       });
 
+      // drill-down binding
+      els.tbody.querySelectorAll("a[data-estab]").forEach(a=>{
+        a.addEventListener("click", (ev)=>{
+          ev.preventDefault();
+          const id = a.getAttribute("data-estab");
+          openModalForEstab(id);
+        });
+      });
+
       els.tableFooter.textContent = `${rows.length} registros exibidos • Bandeira: ${state.brand} • Tipo: ${TYPE_LABEL[state.type] ?? state.type}`;
     }
 
+    // Sorting headers
+    document.querySelectorAll("thead th").forEach(th=>{
+      th.addEventListener("click", ()=>{
+        const key = th.dataset.sort;
+        if(!key) return;
+        if(state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+        else { state.sortKey = key; state.sortDir = (key === "estabelecimento" || key === "status" || key === "banco") ? "asc" : "desc"; }
+        renderTable();
+      });
+    });
+
+    els.search.addEventListener("input", ()=> renderTable());
+
+    // ============================
+    // KPIs + totals
+    // ============================
+    function renderKpis(rows){
+      const liquidado = sum(rows,"liquido");
+      const volume = sum(rows,"volume");
+      const spread = sum(rows,"spread");
+      const taxaMed = rows.length ? sum(rows,"taxa")/rows.length : 0;
+
+      const ativos = estabs.filter(e=>e.ativo).length;
+      const inativos = estabs.filter(e=>!e.ativo).length;
+
+      const tx = Math.max(1, Math.round(sum(rows,"txCount")));
+      const ticketUSD = (volume / tx) || 0;
+
+      // Admin "total transacionado" in BRL (mock)
+      const fx = 5.2; // mock USD->BRL
+      const totalBRL = volume * fx;
+
+      // Saldo BU (mock) derived from spread
+      const saldoBU = Math.max(0, (spread * 0.08) + rand(1200, 4300));
+
+      // Liquidado hoje vs a liquidar
+      // We approximate by looking at the "to" day and splitting by a stable ratio
+      const toIso = state.to;
+      const day = daily.find(d=>d.date===toIso);
+      const dayVol = day ? day.volume : 0;
+      const dayTaxa = day ? day.taxa : 0.024;
+      const dayLiq = Math.max(0, dayVol*(1-dayTaxa) - 120);
+
+      // Split ratio mock: if brand/type filtered, keep it; else 70/30
+      const ratioLiq = (state.type !== "ALL" || state.brand !== "ALL") ? 0.62 : 0.70;
+      const liquidadoHoje = dayLiq * ratioLiq;
+      const aLiquidar = dayLiq * (1 - ratioLiq);
+
+      // Period delta (current vs previous)
+      const line = buildLineData(state.from, state.to, "liquidado");
+      const curTot = line.cur.reduce((a,b)=>a+b,0);
+      const prevTot = line.prev.reduce((a,b)=>a+b,0);
+      const delta = prevTot ? (curTot-prevTot)/prevTot : 0;
+
+      els.kpiLiqHoje.textContent = fmtUSD.format(liquidadoHoje);
+      els.kpiALiquidar.textContent = fmtUSD.format(aLiquidar);
+
+      els.kpiLiquidado.textContent = fmtUSD.format(liquidado);
+      els.kpiVolume.textContent = fmtUSD.format(volume);
+      els.kpiTaxa.textContent = (taxaMed*100).toFixed(2) + "%";
+      els.kpiEstabs.textContent = fmtNum.format(ativos);
+      els.kpiInativos.textContent = fmtNum.format(inativos);
+      els.kpiSaldoBU.textContent = fmtUSD.format(saldoBU);
+
+      els.kpiTransacoes.textContent = fmtNum.format(tx);
+      els.kpiTicketMedio.textContent = fmtBRL.format(ticketUSD * fx);
+      els.kpiTotalTrans.textContent = fmtBRL.format(totalBRL);
+      els.kpiSpread.textContent = fmtUSD.format(spread);
+
+      els.spreadTotal.textContent = fmtUSD.format(spread);
+
+      const b = els.kpiLiquidadoDelta;
+      b.textContent = formatDelta(delta);
+      b.classList.remove("good","bad","warn");
+      if(delta >= 0.03) b.classList.add("good");
+      else if(delta <= -0.03) b.classList.add("bad");
+      else b.classList.add("warn");
+    }
+
+    // ============================
+    // Compute rows + render all
+    // ============================
     function computeRows(){
       state.rows = buildSettlementRows(state.from, state.to, state.brand, state.type);
     }
@@ -1027,79 +1597,66 @@
     function renderAll(){
       computeRows();
       renderKpis(state.rows);
-      renderLineChart();
-      renderBarChart(state.rows);
+      renderCharts(state.rows);
       renderTable();
     }
 
     // ============================
-    // Navigation (THIS is what was broken before)
+    // Apply + Quick Search
     // ============================
-    function go(page){
-      state.page = page;
-      els.navButtons.forEach(b=> b.classList.toggle("active", b.dataset.page === page));
-      Object.entries(pages).forEach(([k,el])=> el.classList.toggle("active", k===page));
-      els.pageTitle.textContent = pageMeta[page].title;
-      els.pageDesc.textContent = pageMeta[page].desc;
-      hideTooltip();
-    }
-    els.navButtons.forEach(btn=> btn.addEventListener("click", ()=> go(btn.dataset.page)));
-
-    // Sorting
-    document.querySelectorAll("thead th").forEach(th=>{
-      th.addEventListener("click", ()=>{
-        const key = th.dataset.sort;
-        if(!key) return;
-        if(state.sortKey === key) state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
-        else { state.sortKey = key; state.sortDir = (key === "estabelecimento" || key === "status") ? "asc" : "desc"; }
-        renderTable();
-      });
-    });
-
-    // Chips
-    els.chips.forEach(ch=>{
-      ch.addEventListener("click", ()=>{
-        els.chips.forEach(x=>x.classList.remove("active"));
-        ch.classList.add("active");
-        state.chartSeries = ch.dataset.series;
-        renderLineChart();
-      });
-    });
-
-    els.btnToggleBars.addEventListener("click", ()=>{
-      state.barMode = state.barMode === "volume" ? "share" : "volume";
-      renderBarChart(state.rows);
-    });
-
-    // Search
-    els.search.addEventListener("input", ()=> renderTable());
-
-    // Apply/Reset
     els.apply.addEventListener("click", ()=>{
       state.from = els.from.value;
       state.to = els.to.value;
       state.brand = els.bandeira.value;
       state.type = els.tipo.value;
+      setChartSeriesButtonState();
       renderAll();
     });
 
-    els.reset.addEventListener("click", ()=>{
-      setDefaultDates();
+    els.quickSearch.addEventListener("click", ()=>{
+      // Quick: last 7 days, all brand/type
+      const to = new Date(today);
+      const from = addDays(today, -7+1);
+      els.from.value = dateISO(from);
+      els.to.value = dateISO(to);
       els.bandeira.value = "ALL";
-      els.tipo.value = "ALL";
       syncTipoOptions();
+      els.tipo.value = "ALL";
+
+      state.from = els.from.value;
+      state.to = els.to.value;
       state.brand = "ALL";
       state.type = "ALL";
       els.search.value = "";
       state.sortKey = "liquido";
       state.sortDir = "desc";
       state.chartSeries = "liquidado";
-      els.chips.forEach(x=>x.classList.toggle("active", x.dataset.series==="liquidado"));
-      state.barMode = "volume";
+      setChartSeriesButtonState();
       renderAll();
     });
 
-    // Exports
+    // Chart series buttons
+    function setChartSeriesButtonState(){
+      const buttons = [
+        {el: els.chipLiquidado, key:"liquidado"},
+        {el: els.chipVolume, key:"volume"},
+        {el: els.chipTaxa, key:"taxa"},
+      ];
+      buttons.forEach(b=>{
+        const active = (state.chartSeries === b.key);
+        b.el.style.borderColor = active ? "rgba(34,197,94,.35)" : "rgba(255,255,255,.10)";
+        b.el.style.background = active ? "rgba(34,197,94,.12)" : "rgba(255,255,255,.03)";
+        b.el.style.color = active ? "rgba(167,243,208,.95)" : "rgba(255,255,255,.92)";
+      });
+    }
+
+    els.chipLiquidado.addEventListener("click", ()=>{ state.chartSeries="liquidado"; setChartSeriesButtonState(); renderCharts(state.rows); });
+    els.chipVolume.addEventListener("click", ()=>{ state.chartSeries="volume"; setChartSeriesButtonState(); renderCharts(state.rows); });
+    els.chipTaxa.addEventListener("click", ()=>{ state.chartSeries="taxa"; setChartSeriesButtonState(); renderCharts(state.rows); });
+
+    // ============================
+    // Exports (CSV/JSON/Print)
+    // ============================
     function download(filename, text){
       const blob = new Blob([text], {type:"text/plain;charset=utf-8"});
       const url = URL.createObjectURL(blob);
@@ -1110,18 +1667,19 @@
     }
 
     function rowsToCSV(rows){
-      const header = ["estabId","estabelecimento","volume","taxa","liquido","spread","status","crescimento","ultima","ativo","bandeira_filtro","tipo_filtro"];
+      const header = ["estabId","estabelecimento","banco","banco_xpay","volume","taxa","liquido","spread","status","ultima","ativo","bandeira_filtro","tipo_filtro"];
       const lines = [header.join(",")];
       rows.forEach(r=>{
         const line = [
           r.estabId,
           `"${r.estabelecimento.replace(/"/g,'""')}"`,
+          `"${String(r.banco||"").replace(/"/g,'""')}"`,
+          r.bancoXPay,
           r.volume.toFixed(2),
           (r.taxa*100).toFixed(2),
           r.liquido.toFixed(2),
           r.spread.toFixed(2),
           r.status,
-          (r.crescimento*100).toFixed(2),
           r.ultima,
           r.ativo,
           state.brand,
@@ -1135,7 +1693,7 @@
     function exportCSV(){
       let rows = [...state.rows];
       const q = (els.search.value || "").trim().toLowerCase();
-      if(q) rows = rows.filter(r=> r.estabelecimento.toLowerCase().includes(q) || r.estabId.toLowerCase().includes(q));
+      if(q) rows = rows.filter(r=> r.estabelecimento.toLowerCase().includes(q) || r.estabId.toLowerCase().includes(q) || (r.banco||"").toLowerCase().includes(q));
       rows = sortRows(rows);
       download(`liquidacoes_${state.from}_a_${state.to}.csv`, rowsToCSV(rows));
     }
@@ -1157,12 +1715,20 @@
 
     els.print.addEventListener("click", ()=> window.print());
 
+    // ============================
     // Init
+    // ============================
+    buildNav(els.navDesktop);
+    buildNav(els.navMobile);
     setDefaultDates();
     syncTipoOptions();
+
     state.brand = els.bandeira.value;
     state.type = els.tipo.value;
+
+    setChartSeriesButtonState();
     renderAll();
+    go("dashboard");
   </script>
 </body>
 </html>
