@@ -40,7 +40,7 @@
     /* App layout */
     .app{
       display:grid;
-      grid-template-columns: 270px 1fr;
+      grid-template-columns: 220px 1fr;
       min-height:100vh;
     }
 
@@ -78,7 +78,7 @@
       border:1px solid transparent;
       background: transparent;
       color:var(--text);
-      padding:10px 10px;
+      padding:8px 10px;
       border-radius:14px;
       display:flex;
       align-items:center;
@@ -95,12 +95,12 @@
     }
     .nav .left{ display:flex; align-items:center; gap:10px; }
     .ico{
-      width:32px; height:32px;
+      width:44px; height:44px;
       border-radius:12px;
       display:grid; place-items:center;
       background: rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.06);
-      font-size:16px;
+      font-size:22px;
     }
 
     /* Main */
@@ -374,7 +374,7 @@
       border-bottom: 1px solid rgba(255,255,255,.08);
       margin-bottom: 12px;
     }
-    .modalHead h3{ margin:0; font-size:16px; }
+    .modalHead h3{ margin:0; font-size:22px; }
     .modalGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -471,7 +471,7 @@
           <div class="modalChart"><canvas id="mLine"></canvas></div>
         </div>
         <div class="card section">
-          <div class="chartTitle"><span>Split por tipo (mock)</span><span class="muted" style="font-size:12px">quantidade</span></div>
+          <div class="chartTitle"><span>Split por tipo </span><span class="muted" style="font-size:12px">quantidade</span></div>
           <div class="modalChart small"><canvas id="mBars"></canvas></div>
         </div>
       </div>
@@ -617,7 +617,7 @@
                 <h3>Transações</h3>
                 <div class="val" id="kpiTransacoes">—</div>
                 <div class="sub">
-                  <span class="badge">mock</span>
+                  <span class="badge"></span>
                   <span class="muted">no período</span>
                 </div>
               </div>
@@ -631,7 +631,7 @@
                 <h3>Ticket médio</h3>
                 <div class="val" id="kpiTicketMedio">—</div>
                 <div class="sub">
-                  <span class="badge">mock</span>
+                  <span class="badge"></span>
                   <span class="muted">por transação</span>
                 </div>
               </div>
@@ -647,7 +647,7 @@
                 <h3>Total transacionado (Admin)</h3>
                 <div class="val" id="kpiTotalTrans">—</div>
                 <div class="sub">
-                  <span class="badge">mock</span>
+                  <span class="badge"></span>
                   <span class="muted">reconciliação</span>
                 </div>
               </div>
@@ -661,7 +661,7 @@
                 <h3>Saldo BU</h3>
                 <div class="val" id="kpiSaldoBU">—</div>
                 <div class="sub">
-                  <span class="badge">mock</span>
+                  <span class="badge"></span>
                   <span class="muted">saldo atual</span>
                 </div>
               </div>
@@ -675,7 +675,7 @@
                 <h3>Receita Spread (período)</h3>
                 <div class="val mono" id="kpiSpread">—</div>
                 <div class="sub">
-                  <span class="badge good">mock</span>
+                  <span class="badge good"></span>
                   <span class="muted">estimativa</span>
                 </div>
               </div>
@@ -689,7 +689,7 @@
             <div class="panel-head">
               <div>
                 <h3>Liquidação diária</h3>
-                <div class="meta">Período atual vs anterior no tooltip. (mock)</div>
+                <div class="meta">Período atual vs anterior no tooltip. </div>
               </div>
               <div class="panel-actions">
                 <button class="btn ghost" id="chipLiquidado">Liquidação</button>
@@ -714,7 +714,7 @@
             </div>
 
             <div class="hint">
-              Gráfico mostra os <b>últimos 3 meses</b> (mock). Quando plugar sua API, preencha <span class="mono">spread</span> por linha/transação e o painel soma automaticamente.
+              Gráfico mostra os <b>últimos 3 meses</b> . Quando plugar sua API, preencha <span class="mono">spread</span> por linha/transação e o painel soma automaticamente.
             </div>
           </div>
         </div>
@@ -1135,7 +1135,7 @@
     els.bandeira.addEventListener("change", syncTipoOptions);
 
     // ============================
-    // Build rows (mock aggregates)
+    // Build rows ( aggregates)
     // ============================
     function getDailySlice(fromISO, toISO){
       const from = new Date(fromISO), to = new Date(toISO);
@@ -1145,7 +1145,7 @@
       });
     }
 
-    // status rule: if last liquidation date within last 2 days -> Agendado, else Liquidado (mock)
+    // status rule: if last liquidation date within last 2 days -> Agendado, else Liquidado 
     function calcStatus(lastDateISO){
       const last = new Date((lastDateISO) + "T00:00:00");
       const cutoff = addDays(new Date(today), -2);
@@ -1318,7 +1318,7 @@
         }
       });
 
-      // Donut brands (volume share - mock)
+      // Donut brands (volume share - )
       const totalVol = sum(rows,"volume") || 1;
       const base = {"Visa":0.28,"Mastercard":0.30,"Elo":0.18,"Amex":0.06,"Pix":0.18};
       const brandVals = BRANDS.map(b=> totalVol * base[b] * rand(0.95,1.05));
@@ -1536,11 +1536,11 @@
       const tx = Math.max(1, Math.round(sum(rows,"txCount")));
       const ticketUSD = (volume / tx) || 0;
 
-      // Admin "total transacionado" in BRL (mock)
-      const fx = 5.2; // mock USD->BRL
+      // Admin "total transacionado" in BRL 
+      const fx = 5.2; // USD->BRL
       const totalBRL = volume * fx;
 
-      // Saldo BU (mock) derived from spread
+      // Saldo BU  derived from spread
       const saldoBU = Math.max(0, (spread * 0.08) + rand(1200, 4300));
 
       // Liquidado hoje vs a liquidar
